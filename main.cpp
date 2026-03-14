@@ -86,7 +86,11 @@ int main(int argc, char* argv[]) {
     //---------------------end output-----------------
     //Usage:    ./a.out 0 5 5 6 plot_data.txt
     //          gnuplot -p -e "plot 'plot_data.txt' using 1:2 with lines title 'Exact', '' using 1:3 with lines title 'Approx'"
-
+    //
+    //или скриптом:
+    //          make
+    //          chmod +x run_and_plot.sh
+    //          ./run_and_plot.sh 0 2 1000 2 plot_data.txt
 // Вычисляем интегральную ошибку(При n=1e7 получаем большую ошибку из-за суммирования большого числа слагаемых с плав точкой
 // единственный способ избежать-суммирование Кэхэна, сложно+потеря времени)
 double err_integral = integralError(a,b,n,k,coef1,deg,20000);
