@@ -24,33 +24,34 @@ int main(int argc, char* argv[]) {
     std::vector<double> f(n);
     
     initialize(x,f,n,k,a,b);
-    double deg=4;//степень многочлена до которой ищем приближение
+    double deg=5;//  =(степень многочлена +1)  до которой ищем приближение
     //
     //printVector(x,n);
-   // printVector(f,n);
+    //printVector(f,n);
     //
 
-    std::vector<double> coef1(n+1,0.0);
+    std::vector<double> coef1(deg,0.0);
     std::vector<double> coef2(n,0.0);
     
     //
     //testing
     //
     /*
-    GetCoeficients(n,x,f,coef1,deg);
+    GetCoeficients(n, x, f, a, b, coef1, deg);
     double point=1.0;
     
     cout<<"Coeficients "<<endl;
     printVector(coef1,n+1);
     
-    cout<<"Value of function "<<k<<" at point "<<point<<" = "<<GetValue(point,a,b,n,x,coef1,deg)<<endl;
-    */
+    cout<<"Value of function "<<k<<" at point "<<point<<" = "<<GetValue(point,a,b,n,coef1,deg)<<endl;
+    
 
+    */
     //Посчитаем норму и замеряем время
     std::chrono::duration<double> elapsed;
     try {
         auto start = std::chrono::high_resolution_clock::now();
-        GetCoeficients(n,x,f,coef1,deg);
+        GetCoeficients(n, x, f, a, b, coef1, deg);
         auto end = std::chrono::high_resolution_clock::now();
         elapsed = end - start;
     }
@@ -60,7 +61,8 @@ int main(int argc, char* argv[]) {
     }
     // time
     std::cout << "Time to find coefficients: " << elapsed.count() << " seconds" << std::endl;
-// Вычисляем интегральную ошибку
+// Вычисляем интегральную ошибку(При n=1e7 получаем большую ошибку из-за суммирования большого числа слагаемых с плав точкой
+// единственный способ избежать-суммирование Кэхэна, сложно+потеря времени)
 double err_integral = integralError(a,b,n,k,coef1,deg,20000);
 std::cout << std::setw(10) << std::setprecision(3) << std::scientific << "Интегральная ошибка E_n = " << err_integral << std::endl;
 /////
