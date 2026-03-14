@@ -5,21 +5,23 @@
 #include "func.h"
 #include "task1.h"
 #include "error.h"
+#include <fstream>
+#include <string>
 using namespace std;
-
-
 int main(int argc, char* argv[]) {
+    // Проверка аргументов: теперь может быть 5 или 6
     if (argc < 5 || argc > 6) {
-        std::cerr << "Usage: " << argv[0] << " a b n k " << std::endl; //проверь формат
+        std::cerr << "Usage: " << argv[0] << " a b n k [output_file]" << std::endl;
         return EXIT_FAILURE;
     }
-    double a = std::stoi(argv[1]);
-    double b = std::stoi(argv[2]);
+    double a = std::stod(argv[1]);
+    double b = std::stod(argv[2]);
     int n = std::stoi(argv[3]);
     int k = std::stoi(argv[4]);
-
-
-
+    std::string outFilename;
+    if (argc == 6) {
+        outFilename = argv[5];
+    }
     std::vector<double> x(n);
     std::vector<double> f(n);
     
@@ -61,6 +63,30 @@ int main(int argc, char* argv[]) {
     }
     // time
     std::cout << "Time to find coefficients: " << elapsed.count() << " seconds" << std::endl;
+    //--------------------output--------------------------
+        if (!outFilename.empty()) {
+        std::ofstream outFile(outFilename);
+        if (!outFile.is_open()) {
+            std::cerr << "Cannot open file: " << outFilename << std::endl;
+            return EXIT_FAILURE;
+        }
+                    const int plotPoints = 1000;
+        double step = (b - a) / (plotPoints - 1);
+
+        outFile << "# x exact approximation\n"; // заголовок
+        for (int i = 0; i < plotPoints; ++i) {
+            double x_val = a + i * step;
+            double exact = GetExactValue(x_val, k);
+            double approx = GetValue(x_val, a, b, n, coef1, deg);
+            outFile << x_val << " " << exact << " " << approx << "\n";
+        }
+        outFile.close();
+        std::cout << "Graph data written to " << outFilename << std::endl;
+    }
+    //---------------------end output-----------------
+    //Usage:    ./a.out 0 5 5 6 plot_data.txt
+    //          gnuplot -p -e "plot 'plot_data.txt' using 1:2 with lines title 'Exact', '' using 1:3 with lines title 'Approx'"
+
 // Вычисляем интегральную ошибку(При n=1e7 получаем большую ошибку из-за суммирования большого числа слагаемых с плав точкой
 // единственный способ избежать-суммирование Кэхэна, сложно+потеря времени)
 double err_integral = integralError(a,b,n,k,coef1,deg,20000);
